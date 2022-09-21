@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.zgg.mybatisplus.mapper.UserMapper">
+
+<!--    List<User> getUserByName(@Param("name") String name);-->
+    <select id="getUserByName" resultType="User">
+        select * from user where name = #{name}
+    </select>
+
+<!--    IPage<User> selectPageCustom(@Param("page") Page<User> page, @Param("age") Integer age);-->
+    <select id="selectPageCustom" resultType="User">
+        select * from t_user where age > #{age}
+    </select>
+
+</mapper>

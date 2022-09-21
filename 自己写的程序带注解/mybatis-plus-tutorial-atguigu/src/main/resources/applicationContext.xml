@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 引入jdbc.properties -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <context:component-scan base-package="org.zgg.mybatisplus.service"/>
+
+    <!-- 配置Druid数据源 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+<!--    Spring整合MyBatis-->
+    <!-- 配置用于创建SqlSessionFactory的工厂bean -->
+<!--    <bean class="org.mybatis.spring.SqlSessionFactoryBean">-->
+<!--        &lt;!&ndash; 设置MyBatis配置文件的路径（可以不设置） &ndash;&gt;-->
+<!--        <property name="configLocation" value="classpath:mybatis-config.xml">-->
+<!--        </property>-->
+<!--        &lt;!&ndash; 设置数据源 &ndash;&gt;-->
+<!--        <property name="dataSource" ref="dataSource"/>-->
+<!--        &lt;!&ndash; 设置类型别名所对应的包 &ndash;&gt;-->
+<!--        <property name="typeAliasesPackage" value="org.zgg.mybatisplus.bean"/>-->
+<!--        &lt;!&ndash;-->
+<!--            设置映射文件的路径-->
+<!--            若映射文件所在路径和mapper接口所在路径一致，则不需要设置-->
+<!--        &ndash;&gt;-->
+
+<!--        &lt;!&ndash;-->
+<!--            <property name="mapperLocations" value="classpath:mapper/*.xml"></property>-->
+<!--        &ndash;&gt;-->
+<!--    </bean>-->
+
+    <!--
+         加入MyBatis-Plus
+
+         MybatisSqlSessionFactoryBean:
+            具有SqlSessionFactoryBean的基础功能，又具有MyBatis-Plus的扩展配置
+    -->
+    <bean class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <!-- 设置MyBatis配置文件的路径（可以不设置） -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!-- 设置数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 设置类型别名所对应的包 -->
+        <property name="typeAliasesPackage" value="org.zgg.mybatisplus.bean"/>
+        <!--
+             设置映射文件的路径
+             若映射文件所在路径和mapper接口所在路径一致，则不需要设置
+         -->
+        <!--
+              <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+        -->
+
+        <!-- 设置MyBatis-Plus的全局配置 -->
+        <property name="globalConfig" ref="globalConfig"/>
+        <!--配置插件-->
+        <property name="plugins">
+            <array>
+                <ref bean="mybatisPlusInterceptor" />
+            </array>
+        </property>
+
+        <!-- 配置扫描通用枚举 -->
+        <property name="typeEnumsPackage" value="org.zgg.mybatisplus.enums"/>
+    </bean>
+
+    <!--
+        配置mapper接口的扫描配置
+        由mybatis-spring提供，可以将指定包下所有的mapper接口创建动态代理
+        并将这些动态代理作为IOC容器的bean管理
+    -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="org.zgg.mybatisplus.mapper"/>
+    </bean>
+
+    <bean id="globalConfig" class="com.baomidou.mybatisplus.core.config.GlobalConfig">
+        <property name="dbConfig">
+            <bean class="com.baomidou.mybatisplus.core.config.GlobalConfig$DbConfig">
+                <!-- 设置实体类所对应的表的前缀 -->
+                <property name="tablePrefix" value="t_"/>
+                <!-- 设置全局主键策略 -->
+<!--                <property name="idType" value="AUTO"/>-->
+            </bean>
+        </property>
+    </bean>
+
+    <!--配置MyBatis-Plus插件-->
+    <bean id="mybatisPlusInterceptor"
+          class="com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor">
+        <property name="interceptors">
+            <list>
+                <ref bean="paginationInnerInterceptor"/>
+                <ref bean="optimisticLockerInnerInterceptor"/>
+            </list>
+        </property>
+    </bean>
+    <!--配置MyBatis-Plus分页插件的bean-->
+    <bean id="paginationInnerInterceptor"
+          class="com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor">
+        <!--设置数据库类型-->
+        <property name="dbType" value="MYSQL"/>
+    </bean>
+
+    <!--配置乐观锁插件-->
+    <bean id="optimisticLockerInnerInterceptor"
+          class="com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor"/>
+</beans>
