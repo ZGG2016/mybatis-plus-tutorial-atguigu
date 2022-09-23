@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.zgg.mybatisplus.enums.SexEnum;
 
-// lombok注解，自动生成构造方法、getter、setter...
+// lombok注解，自动生成getter、setter...
 @Data
 // 默认实体类会匹配到数据库的同名表，如果不一致的话，可以在类上使用这个注解匹配
 // 也可也在配置文件中配置全局的
